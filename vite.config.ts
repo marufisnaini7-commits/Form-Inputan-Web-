@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/Form-Inputan-Web-BKHIT-Papua-Barat-Daya/',
+    base: '/Form-Inputan-Web-/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
