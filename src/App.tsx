@@ -1838,7 +1838,7 @@ export default function App() {
 
                     <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-100/70 text-left">
                       <span className="text-[10px] text-amber-800 font-semibold leading-relaxed block">
-                        📌 <b>Petunjuk Demo:</b> Gunakan sandi internal <b>"BkhitPBD"</b> atau <b>"admin123"</b> untuk membuka database operasional.
+                        📌 <b> Gunakan </b> sandi internal <b></b><b></b> untuk membuka database operasional.
                       </span>
                     </div>
 
@@ -2012,7 +2012,7 @@ export default function App() {
 
                     <div className="bg-amber-50/70 p-3 rounded-xl border border-amber-100/70 text-left">
                       <span className="text-[10px] text-amber-800 font-semibold leading-relaxed block">
-                        📌 <b>Petunjuk Demo:</b> Gunakan sandi internal <b>"BkhitPBD"</b> atau <b>"admin123"</b> untuk membuka panel setelan.
+                        📌 <b>Gunakan</b>sandi internal <b><b></b> untuk membuka panel setelan.
                       </span>
                     </div>
 
