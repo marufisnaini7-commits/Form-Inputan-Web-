@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { StorageConfig, StorageMode } from '../types';
 import { googleAppsScriptTemplate } from '../data';
-import { Database, FileSpreadsheet, Code, Copy, Check, CheckCircle2, ChevronDown, ChevronUp, AlertCircle, Share2 } from 'lucide-react';
+import { Database, FileSpreadsheet, Code, Copy, Check, CheckCircle2, ChevronDown, ChevronUp, AlertCircle, Share2, Image } from 'lucide-react';
 
 interface StorageConfigPanelProps {
   config: StorageConfig;
@@ -17,6 +17,27 @@ interface StorageConfigPanelProps {
   onGoogleSignIn: () => Promise<void>;
   onGoogleSignOut: () => Promise<void>;
   userEmail?: string | null;
+}
+
+export function convertGoogleDriveLink(url: string): string {
+  const cleanUrl = url.trim();
+  if (!cleanUrl) return '';
+  
+  // Pattern 1: https://drive.google.com/file/d/FILE_ID/view...
+  const fileDRegex = /\/file\/d\/([a-zA-Z0-9_-]+)/;
+  const matchD = cleanUrl.match(fileDRegex);
+  if (matchD && matchD[1]) {
+    return `https://lh3.googleusercontent.com/d/${matchD[1]}`;
+  }
+
+  // Pattern 2: https://drive.google.com/open?id=FILE_ID or uc?id=FILE_ID or uc?export=download&id=FILE_ID
+  const idParamRegex = /[?&]id=([a-zA-Z0-9_-]+)/;
+  const matchId = cleanUrl.match(idParamRegex);
+  if (matchId && matchId[1]) {
+    return `https://lh3.googleusercontent.com/d/${matchId[1]}`;
+  }
+
+  return cleanUrl; // Return as-is if it's already a direct link or not Google Drive
 }
 
 export default function StorageConfigPanel({
@@ -38,6 +59,7 @@ export default function StorageConfigPanel({
   const [tempSpreadsheetId, setTempSpreadsheetId] = useState(config.spreadsheetId || '');
   const [tempSheetName, setTempSheetName] = useState(config.sheetName || 'Laporan_Karantina');
   const [tempAppsScriptUrl, setTempAppsScriptUrl] = useState(config.appsScriptUrl || '');
+  const [tempLogoUrl, setTempLogoUrl] = useState(config.logoUrl || '');
 
   const handleCopyScript = async () => {
     try {
@@ -63,12 +85,18 @@ export default function StorageConfigPanel({
   };
 
   const handleSaveConfig = (mode: StorageMode) => {
+    const formattedLogoUrl = convertGoogleDriveLink(tempLogoUrl);
     onChangeConfig({
       mode,
       spreadsheetId: tempSpreadsheetId,
       sheetName: tempSheetName,
-      appsScriptUrl: tempAppsScriptUrl
+      appsScriptUrl: tempAppsScriptUrl,
+      logoUrl: formattedLogoUrl
     });
+    // Sync local state as well
+    if (formattedLogoUrl !== tempLogoUrl) {
+      setTempLogoUrl(formattedLogoUrl);
+    }
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 2000);
   };
@@ -364,6 +392,80 @@ export default function StorageConfigPanel({
             </div>
           </div>
         )}
+
+        {/* Custom Logo Card Section - Universal Configuration */}
+        <div className="mt-8 pt-6 border-t border-slate-100 text-left space-y-4">
+          <div className="flex items-center gap-2">
+            <Image className="w-5 h-5 text-indigo-600" />
+            <div>
+              <h3 className="font-bold text-sm text-slate-800">Kustomisasi Logo Unit (Google Drive / Link Gambar)</h3>
+              <p className="text-[11px] text-slate-500">Sesuaikan logo instansi di pojok kiri atas aplikasi</p>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-3 leading-relaxed">
+            <span className="font-bold text-indigo-800 block">💡 Cara Menggunakan Link Google Drive:</span>
+            <ol className="list-decimal list-inside space-y-1.5 text-slate-600 pl-1">
+              <li>Unggah gambar logo ke Google Drive Anda.</li>
+              <li>Klik kanan pada file, pilih <b>Bagikan (Share)</b>, lalu ubah akses umum menjadi <b>Siapa saja yang memiliki link (Anyone with link can view)</b>.</li>
+              <li>Salin link bagikan tersebut dan tempelkan di bawah ini. Tautan berformat <code className="bg-slate-200 px-1 py-0.5 rounded font-mono">https://drive.google.com/file/d/...</code> akan otomatis dikonversi agar bisa langsung me-render gambar dengan baik!</li>
+            </ol>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            <div className="md:col-span-9 space-y-1.5">
+              <label className="text-xs font-semibold text-slate-700 block text-left">
+                Tautan Logo Google Drive / Direct Image URL
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Masukkan link Google Drive Anda di sini (Contoh: https://drive.google.com/file/d/xxxxxx/view)"
+                  value={tempLogoUrl}
+                  onChange={(e) => setTempLogoUrl(e.target.value)}
+                  className="w-full text-xs pl-3 pr-10 py-2.5 rounded-lg border border-slate-250 focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 font-medium"
+                />
+                {tempLogoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTempLogoUrl('');
+                    }}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="md:col-span-3">
+              <button
+                type="button"
+                onClick={() => handleSaveConfig(config.mode)}
+                className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-lg text-xs transition-colors flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+              >
+                <Check className="w-4 h-4" /> Simpan Logo
+              </button>
+            </div>
+          </div>
+
+          {config.logoUrl && (
+            <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-150 p-3 rounded-lg text-xs text-emerald-800">
+              <div className="w-10 h-10 bg-white rounded border border-emerald-200 p-1 flex items-center justify-center shrink-0">
+                <img 
+                  src={config.logoUrl} 
+                  alt="Preview Logo Kustom" 
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div>
+                <span className="font-bold block">Pratinjau Logo Aktif Berhasil Dimuat</span>
+                <p className="text-[10px] text-emerald-600 mt-0.5">Logo telah diset dan disimpan di pengaturan lokal Anda.</p>
+              </div>
+            </div>
+          )}
+        </div>
 
         {isSaved && (
           <div className="mt-3 p-2 bg-indigo-50 text-indigo-800 text-xs font-semibold text-center rounded-lg border border-indigo-200 flex items-center justify-center gap-1.5 animate-fade-in">

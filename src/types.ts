@@ -38,6 +38,7 @@ export interface StorageConfig {
   spreadsheetId: string;
   sheetName: string;
   appsScriptUrl: string;
+  logoUrl?: string;
 }
 
 export const TEMPAT_PELAYANAN_LIST = [
