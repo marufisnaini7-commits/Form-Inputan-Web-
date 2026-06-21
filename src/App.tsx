@@ -632,7 +632,7 @@ export default function App() {
         <div id="header-brand" className="flex items-center gap-3.5 text-left w-full md:w-auto">
           <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100 shrink-0 p-0.5">
             <img 
-              src={storageConfig.logoUrl || "https://upload.wikimedia.org/wikipedia/commons/d/de/Logo_Badan_Karantina_Indonesia.png"} 
+              src={storageConfig.logoUrl || "https://lh3.googleusercontent.com/d/1bPZXtvaDjpTBo_f2oKdSIYZ7SzY5cc7k"} 
               alt="Logo Karantina Indonesia" 
               className="w-full h-full object-contain"
               referrerPolicy="no-referrer"
